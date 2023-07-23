@@ -1,69 +1,7 @@
-import { NextApiHandler } from 'next';
-import { isString } from 'sanity';
+import type { NextApiRequest, NextApiResponse } from 'next'
 
-import { client } from '../../../sanity/client';
-import { previewSecretId } from '../../../sanity/constants';
-import { readToken } from '../../../sanity/env';
-import { getSecret } from '../../../sanity/secret';
-
-const AVAILABLE_TYPES = ['home', 'frontpage', 'page'];
-
-const handler: NextApiHandler = async function preview(req, res) {
-  if (!readToken) {
-    res.status(404);
-    res.end();
-    return;
-  }
-
-  const { query } = req;
-
-  const secret = isString(query.secret) ? query.secret : undefined;
-  const type = isString(query.type) ? query.type : '';
-  // const slug = isString(query.slug) ? query.slug : undefined;
-
-  if (!AVAILABLE_TYPES.includes(type)) {
-    res.status(401);
-    res.send('Not available document type');
-    return;
-  }
-  if (!secret) {
-    res.status(401);
-    res.send('Invalid secret');
-    return;
-  }
-
-  const authClient = client.withConfig({ useCdn: false, token: readToken });
-
-  // The secret can't be stored in an env variable with a NEXT_PUBLIC_ prefix, as it would make you
-  // vulnerable to leaking the token to anyone. If you don't have an custom API with authentication
-  // that can handle checking secrets, you may use https://github.com/sanity-io/sanity-studio-secrets
-  // to store the secret in your dataset.
-  const storedSecret = await getSecret({
-    client: authClient,
-    id: previewSecretId,
-  });
-
-  // This is the most common way to check for auth, but we encourage you to use your existing auth
-  // infra to protect your token and securely transmit it to the client
-  if (secret !== storedSecret) {
-    return res.status(401).send('Invalid secret');
-  }
-
-  // TODO fix preview
-  let location = '';
-
-  if (type === 'homePage') {
-    location = '/';
-  }
-
-  if (location) {
-    res.setPreviewData({ token: readToken });
-    res.writeHead(307, { Location: location });
-    res.end();
-  }
-
-  res.status(404);
-  res.end();
-};
-
-export default handler;
+export default function preview(req: NextApiRequest, res: NextApiResponse) {
+    res.setDraftMode({ enable: true })
+    res.writeHead(307, { Location: '/' })
+    res.end()
+}
