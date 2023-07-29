@@ -18,11 +18,51 @@ export type HomeViewProps = {
 };
 
 export const HomeView = ({ page, settings }: HomeViewProps) => {
-  const hello = api.example.hello.useQuery({ text: "from tRPC" });
+  const { data, isLoading: isDataLoading } = api.example.hello.useQuery({
+    text: "from tRPC",
+  });
 
-  const { user, error, isLoading } = useUser();
+  const { data: postsData, isLoading: isExampleLoading } =
+    api.example.getAllPosts.useQuery();
 
-  if (isLoading) return <div>Loading...</div>;
+  const { data: exampleData, isLoading: isExampleDataLoading } =
+    api.example.test.useQuery();
+
+  // console.log("postsData", postsData);
+  // console.log("exampleData", exampleData);
+
+  const { mutate } = api.example.addExample.useMutation();
+  const productMutation = api.products.create.useMutation();
+
+  const savePostMutation = api.users.savePost.useMutation();
+
+  const { user, error, isLoading: isUserLoading } = useUser();
+
+  if (isUserLoading || isDataLoading) return <div>Loading...</div>;
+
+  const addProduct = () => {
+    try {
+      const res = productMutation.mutateAsync({
+        title: "My first product title",
+      });
+      console.log("res", res);
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
+  const handleSavePost = () => {
+    try {
+      const response = savePostMutation.mutate({
+        userId: "clkh8omjc0000sox653k7alh2",
+        productId: "clkh8vpl10000so7o6v01wngo",
+      });
+      console.log("response", response);
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
   return (
     <>
       <Head>
@@ -32,6 +72,16 @@ export const HomeView = ({ page, settings }: HomeViewProps) => {
       </Head>
       <div>
         <h1 className="my-10 bg-orange-200 p-4 text-3xl">{page.title}</h1>
+        <div>{data.greeting}</div>
+        <div className="flex flex-col gap-2 p-4">
+          <button onClick={addProduct}>Add new post</button>
+          <button
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+            onClick={handleSavePost}
+          >
+            Update user with saved post
+          </button>
+        </div>
 
         <main className="mx-auto max-w-7xl px-10">
           {user ? (

@@ -45,7 +45,10 @@ const createInnerTRPCContext = (_opts: CreateContextOptions) => {
  * @see https://trpc.io/docs/context
  */
 export const createTRPCContext = (_opts: CreateNextContextOptions) => {
-  return createInnerTRPCContext({});
+  // can populate with session, userId etc
+  return {
+    prisma
+  }
 };
 
 /**
