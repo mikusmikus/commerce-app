@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-html-link-for-pages */
 import { getClient } from "@/sanity/lib/getClient";
 import { type GetStaticProps } from "next";
 import { HOME_PAGE_QUERY } from "@/lib/groq-queries";

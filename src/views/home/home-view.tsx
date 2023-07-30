@@ -22,8 +22,10 @@ export const HomeView = ({ page, settings }: HomeViewProps) => {
     text: "from tRPC",
   });
 
-  const { data: postsData, isLoading: isExampleLoading } =
-    api.example.getAllPosts.useQuery();
+  const { data: products, isLoading: isExampleLoading } =
+    api.products.getUserProducts.useQuery();
+
+  console.log("products", products);
 
   const { data: exampleData, isLoading: isExampleDataLoading } =
     api.example.test.useQuery();
@@ -74,13 +76,8 @@ export const HomeView = ({ page, settings }: HomeViewProps) => {
         <h1 className="my-10 bg-orange-200 p-4 text-3xl">{page.title}</h1>
         <div>{data.greeting}</div>
         <div className="flex flex-col gap-2 p-4">
-          <button onClick={addProduct}>Add new post</button>
-          <button
-            // eslint-disable-next-line @typescript-eslint/no-misused-promises
-            onClick={handleSavePost}
-          >
-            Update user with saved post
-          </button>
+          <button onClick={addProduct}>Add new product</button>
+          <button onClick={handleSavePost}>Update user with saved post</button>
         </div>
 
         <main className="mx-auto max-w-7xl px-10">

@@ -38,10 +38,18 @@ model Product {
   id              String   @id @default(cuid())
   createdAt       DateTime @default(now())
   title           String
-  price           Float
+  price           Price?
   quantity        Int
   postsSavedBy    User[]   @relation("SavedProducts")
   postsIventoryBy User[]   @relation("InventoryProducts")
+}
+
+model Price {
+  id          String  @id @default(cuid())
+  priceInNok  Float
+  priceInEuro Float
+  Product     Product @relation(fields: [productId], references: [id])
+  productId   String  @unique
 }
 
 enum Role {
